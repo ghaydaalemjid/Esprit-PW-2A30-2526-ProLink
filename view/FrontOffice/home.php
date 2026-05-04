@@ -1,132 +1,255 @@
 <?php
-// Ensure session is started before any output from this page or included components
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
+
+require_once('../../controller/projectC.php');
+$pc = new ProjectC();
+$projects = $pc->listProjects();
 ?>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>ProLink - Accueil</title>
-    <script>try{if(localStorage.getItem('prolink-theme')==='dark')document.documentElement.classList.add('dark-mode');}catch(e){}</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ProLink - Accueil</title>
 
-    <!-- Google Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-    <!-- Project stylesheet (relative to this file) -->
-    <link rel="stylesheet" href="../assets/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 
-    <style>
-        :root{
-            --bg: #0b1220;
-            --muted: #9aa6b2;
-            --card: #0f1724;
-            --accent-1: #00a7ff;
-            --accent-2: #00d4ff;
-            --glass: rgba(255,255,255,0.04);
-            --shadow: 0 12px 40px rgba(2,12,27,0.55);
-            --radius-lg: 16px;
-        }
+<style>
+body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(180deg,#061022 0%, #07162a 100%);
+    color:#e6f0f6;
+    margin:0;
+}
 
-        /* Page layout */
-        body{
-            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
-            background: radial-gradient(1200px 400px at 10% 10%, rgba(0,167,255,0.06), transparent 10%), linear-gradient(180deg,#061022 0%, #07162a 100%);
-            color:#e6f0f6; margin:0; -webkit-font-smoothing:antialiased; display:flex; flex-direction:column; min-height:100vh;
-        }
+.container {
+    max-width:1200px;
+    margin:auto;
+    padding:20px;
+}
 
-        .container{ max-width:1100px; margin:0 auto; padding:28px 20px; }
-        .main{ flex:1; display:block }
+/* HERO */
+.hero {
+    padding:60px;
+    background: linear-gradient(135deg,#00a7ff,#00d4ff);
+    border-radius:20px;
+    color:#00151b;
+    margin-top:20px;
+}
 
-        /* Hero */
-        .hero{
-            display:flex; gap:28px; align-items:center; justify-content:space-between; padding:56px; background: linear-gradient(90deg,var(--accent-1), var(--accent-2)); color:#042031; border-radius:var(--radius-lg); margin:28px 0; box-shadow: var(--shadow);
-            position:relative; overflow:hidden;
-        }
+.hero h1 {
+    font-size:40px;
+    font-weight:800;
+}
 
-        /* subtle animated accent shape */
-        .hero::after{
-            content:''; position:absolute; right:-10%; top:-20%; width:380px; height:380px; background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.06), transparent 30%);
-            transform: rotate(25deg); opacity:0.9; pointer-events:none;
-        }
+.hero p {
+    font-size:18px;
+}
 
-        .hero-left{ max-width:62%; }
-        .hero h1{ font-size:44px; margin:0 0 12px; line-height:1.02; color:#00151b; letter-spacing:-0.5px }
-        .hero p{ margin:0 0 18px; color:rgba(0,21,26,0.85); font-weight:600 }
+.cta {
+    background:#00151b;
+    color:#00d4ff;
+    padding:12px 25px;
+    border-radius:10px;
+    text-decoration:none;
+    display:inline-block;
+    margin-top:15px;
+    transition:0.3s;
+}
 
-        .cta{ display:inline-block; background:linear-gradient(90deg,#00151b, #012a35); color:var(--accent-2); padding:14px 22px; border-radius:12px; font-weight:800; text-decoration:none; box-shadow: 0 10px 30px rgba(0,167,255,0.12); transition: transform .18s ease, box-shadow .18s ease; }
-        .cta:hover{ transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,212,255,0.14); }
-        .cta:focus{ outline: 3px solid rgba(0,167,255,0.14); outline-offset:4px }
+.cta:hover {
+    background:#00313a;
+}
 
-        .hero-visual{ flex:1; display:flex; justify-content:flex-end }
-        .glass-card{ background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)); border-radius:12px; padding:14px; backdrop-filter: blur(6px); box-shadow: 0 10px 30px rgba(2,12,27,0.5); color:#dff6ff }
+/* FEATURES */
+.features {
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:20px;
+    margin-top:30px;
+}
 
-        /* Features */
-        .features{ display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:18px; margin:28px 0 }
-        .feature-card{ background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:12px; padding:22px; text-align:left; box-shadow: 0 8px 26px rgba(2,12,27,0.55); display:flex; gap:14px; align-items:flex-start; transition: transform .18s ease, box-shadow .18s ease }
-        .feature-card:hover{ transform: translateY(-6px); box-shadow: 0 18px 40px rgba(2,12,27,0.6) }
+.feature-card {
+    background:#0f1724;
+    padding:25px;
+    border-radius:15px;
+    transition:0.3s;
+}
 
-        .feature-icon{ width:64px; height:64px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:26px; background: linear-gradient(135deg,var(--accent-1),var(--accent-2)); color:#00151b; box-shadow: 0 8px 20px rgba(2,12,27,0.5) }
-        .feature-card h3{ color:#e6f0f6; margin:0 0 6px; font-size:18px }
-        .feature-card p{ margin:0; color:var(--muted) }
+.feature-card:hover {
+    transform:translateY(-5px);
+    box-shadow:0 10px 25px rgba(0,0,0,0.3);
+}
 
-        /* subtle entrance animation */
-        .feature-card, .stat, .glass-card{ opacity:0; transform: translateY(8px); animation: fadeUp .48s ease forwards; }
-        .feature-card:nth-child(1){ animation-delay: 0.06s }
-        .feature-card:nth-child(2){ animation-delay: 0.12s }
-        .feature-card:nth-child(3){ animation-delay: 0.18s }
+/* PROJECT GRID */
+.project-grid {
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:25px;
+    margin-top:20px;
+}
 
-        @keyframes fadeUp{ to { opacity:1; transform:none } }
+/* PROJECT CARD */
+.project-card {
+    position:relative;
+    border-radius:18px;
+    overflow:hidden;
+    background:#0f1724;
+    transition:0.4s;
+    cursor:pointer;
+}
 
-        @media (max-width:900px){ .hero{ flex-direction:column; text-align:left } .hero-left{ max-width:100% } .hero-visual{ justify-content:flex-start; width:100% } }
-        @media (max-width:520px){ .hero{ padding:26px } .hero h1{ font-size:28px } .feature-icon{ width:52px; height:52px } }
-    </style>
+/* IMAGE */
+.project-img {
+    height:180px;
+    background: linear-gradient(135deg,#00d4ff,#0066ff);
+    opacity:0.85;
+    transition:0.4s;
+}
+
+/* CONTENT (FIX ICI) */
+.project-content {
+    padding:20px;
+    color:#ffffff; /* ✅ correction principale */
+}
+
+.project-content h3 {
+    margin:0 0 10px;
+    font-size:20px;
+    font-weight:700;
+    color:#ffffff; /* ✅ titre visible */
+}
+
+.project-content p {
+    font-size:14px;
+    color:#cbd5e1; /* ✅ texte lisible */
+    opacity:1;
+}
+
+/* BUTTON */
+.btn-view {
+    display:inline-block;
+    margin-top:10px;
+    padding:10px 18px;
+    border-radius:8px;
+    background:#00d4ff;
+    color:#00151b;
+    text-decoration:none;
+    font-weight:600;
+    transition:0.3s;
+}
+
+.btn-view:hover {
+    background:#00a7cc;
+}
+
+/* BADGE */
+.badge {
+    position:absolute;
+    top:12px;
+    right:12px;
+    padding:6px 12px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:bold;
+}
+
+.badge.active {
+    background:#28a745;
+    color:white;
+}
+
+.badge.inactive {
+    background:#dc3545;
+    color:white;
+}
+
+/* HOVER */
+.project-card:hover {
+    transform:translateY(-10px) scale(1.02);
+    box-shadow:0 20px 40px rgba(0,0,0,0.5);
+}
+
+.project-card:hover .project-img {
+    opacity:1;
+}
+
+h2 {
+    margin-top:40px;
+}
+</style>
+
 </head>
 
 <body>
 
-<!-- NAVBAR -->
 <?php include 'components/navbar.php'; ?>
 
-<!-- MAIN (fills available vertical space so footer stays at bottom) -->
-<main class="main container">
+<div class="container">
 
-<!-- HERO -->
-<section class="hero">
-    <h1>Bienvenue sur ProLink</h1>
-    <p>Connectez-vous avec des professionnels, partagez vos projets et développez votre réseau.</p>
-    <a href="catalogue.php" class="cta">Découvrir la boutique</a>
-</section>
+    <!-- HERO -->
+    <section class="hero">
+        <h1>🚀 Bienvenue sur ProLink</h1>
+        <p>Connectez-vous avec des professionnels et développez vos projets.</p>
+        <a href="../register.php" class="cta">Commencer</a>
+    </section>
 
-<!-- FEATURES -->
-<section>
-    <div class="features">
+    <!-- FEATURES -->
+    <section class="features">
         <div class="feature-card">
-            <div style="font-size:28px">🌐</div>
-            <h3>Réseau</h3>
-            <p class="hint">Ajoutez et interagissez avec des professionnels pour étendre votre réseau.</p>
+            <h3>🌐 Réseau</h3>
+            <p>Développez votre réseau professionnel.</p>
         </div>
 
         <div class="feature-card">
-            <div style="font-size:28px">📁</div>
-            <h3>Projets</h3>
-            <p class="hint">Publiez et collaborez sur des projets, trouvez des partenaires.</p>
+            <h3>📁 Projets</h3>
+            <p>Publiez et collaborez sur des projets.</p>
         </div>
 
         <div class="feature-card">
-            <div style="font-size:28px">🛒</div>
-            <h3>Achat / Vente</h3>
-            <p class="hint">Catalogue produits, panier, commandes et suivi livraison (module Pro).</p>
-            <a href="catalogue.php" class="cta" style="margin-top:12px;display:inline-block;font-size:14px;padding:10px 16px">Voir la boutique</a>
+            <h3>📅 Événements</h3>
+            <p>Participez à des événements professionnels.</p>
         </div>
-    </div>
+    </section>
 
-</section>
+    <!-- PROJETS -->
+    <section>
+        <h2>🔥 Derniers projets</h2>
 
-</main>
+        <div class="project-grid">
+            <?php foreach($projects as $p) { ?>
 
-<!-- FOOTER -->
+                <div class="project-card">
+
+                    <div class="project-img"></div>
+
+                    <span class="badge <?= $p['status']=='actif' ? 'active' : 'inactive' ?>">
+                        <?= $p['status'] ?>
+                    </span>
+
+                    <div class="project-content">
+                        <h3><?= htmlspecialchars($p['title']) ?></h3>
+
+                        <p>
+                            <?= substr(htmlspecialchars($p['description']),0,80) ?>...
+                        </p>
+
+                        <a href="projectDetails.php?id=<?= $p['idProject'] ?>" class="btn-view">
+                            👁 Voir détails
+                        </a>
+                    </div>
+
+                </div>
+
+            <?php } ?>
+        </div>
+    </section>
+
+</div>
+
 <?php include 'components/footer.php'; ?>
 
 </body>
