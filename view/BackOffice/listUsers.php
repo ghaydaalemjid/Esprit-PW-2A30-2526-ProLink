@@ -1,28 +1,32 @@
 <?php
-include '../../Controller/UserP.php';
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+// ⚠️ chemin + casse correcte
+require_once('../../controller/UserP.php');
 
 $userP = new UserP();
 $list = $userP->listUsers();
 ?>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <title>Liste des utilisateurs</title>
-    <?php /* Styles are in sidebar.css included by sidebar.php */ ?>
 </head>
 
 <body>
 
 <?php include 'sidebar.php'; ?>
 
-<div class="content">
+<div class="main-content">
     <div class="container">
 
         <div class="topbar">
             <div class="page-title">Liste des utilisateurs</div>
             <div class="actions">
-                <input class="search-input" placeholder="Rechercher un utilisateur..." id="searchInput">
+                <input class="search-input" placeholder="Rechercher..." id="searchInput">
                 <a href="addUser.php" class="btn btn-primary">+ Ajouter</a>
             </div>
         </div>
@@ -39,22 +43,24 @@ $list = $userP->listUsers();
                 <th>Actions</th>
             </tr>
             </thead>
+
             <tbody>
-            <?php foreach ($list as $user) { ?>
+            <?php if($list) { foreach ($list as $user) { ?>
                 <tr>
-                    <td><?= htmlspecialchars($user['iduser']); ?></td>
-                    <td><?= htmlspecialchars($user['nom']); ?></td>
-                    <td><?= htmlspecialchars($user['prenom']); ?></td>
+                    <td><?= htmlspecialchars($user['idUser']); ?></td>
+                    <td><?= htmlspecialchars($user['name']); ?></td>
+                    <td><?= htmlspecialchars($user['prenom'] ?? ''); ?></td>
                     <td><?= htmlspecialchars($user['email']); ?></td>
-                    <td><?= htmlspecialchars($user['type']); ?></td>
-                    <td><?= htmlspecialchars($user['age']); ?></td>
+                    <td><?= htmlspecialchars($user['role']); ?></td>
+                    <td><?= htmlspecialchars($user['age'] ?? ''); ?></td>
+
                     <td>
-                        <a class="btn btn-secondary" href="detailUser.php?id=<?= $user['iduser']; ?>">Voir</a>
-                        <a class="btn btn-secondary" href="updateUser.php?id=<?= $user['iduser']; ?>">Modifier</a>
-                        <a class="btn btn-danger js-delete" href="#" data-confirm="Voulez-vous vraiment supprimer cet utilisateur ?" data-href="deleteUser.php?id=<?= $user['iduser']; ?>">Supprimer</a>
+                        <a class="btn btn-secondary" href="detailUser.php?id=<?= $user['idUser']; ?>">Voir</a>
+                        <a class="btn btn-secondary" href="updateUser.php?id=<?= $user['idUser']; ?>">Modifier</a>
+                        <a class="btn btn-danger js-delete" href="#" data-href="deleteUser.php?id=<?= $user['idUser']; ?>">Supprimer</a>
                     </td>
                 </tr>
-            <?php } ?>
+            <?php }} ?>
             </tbody>
         </table>
 
@@ -62,14 +68,13 @@ $list = $userP->listUsers();
 </div>
 
 <script>
-    // small client-side search (non-blocking)
-    document.getElementById('searchInput').addEventListener('input', function(e){
-        const q = e.target.value.toLowerCase();
-        const rows = document.querySelectorAll('#usersTable tbody tr');
-        rows.forEach(r => {
-            r.style.display = Array.from(r.cells).some(c => c.textContent.toLowerCase().includes(q)) ? '' : 'none';
-        });
+document.getElementById('searchInput').addEventListener('input', function(e){
+    const q = e.target.value.toLowerCase();
+    const rows = document.querySelectorAll('#usersTable tbody tr');
+    rows.forEach(r => {
+        r.style.display = Array.from(r.cells).some(c => c.textContent.toLowerCase().includes(q)) ? '' : 'none';
     });
+});
 </script>
 
 </body>
